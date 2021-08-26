@@ -1,0 +1,30 @@
+{
+  "name": "bernigend/bmstu-schedule-bot",
+  "description": "Бот с расписанием МГТУ им. Н. Э. Баумана",
+  "minimum-stability": "stable",
+  "version": "0.0.1",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Bernigend",
+      "email": "bernigend@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "ext-pdo": "*",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "vlucas/phpdotenv": "5.3.0",
+    "robmorgan/phinx": "0.12.7",
+    "symfony/yaml": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app/"
+    },
+    "files": [
+      "app/api/bitop/swagger/vendor/autoload.php"
+    ]
+  }
+}
