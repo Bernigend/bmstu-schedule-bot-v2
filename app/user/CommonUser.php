@@ -9,7 +9,7 @@ use app\user\exception\RegisterCommonUserException;
 class CommonUser
 {
     /** @var string */
-    protected const DEFAULT_EXPECTED_INPUT = RegistrationCommandHandler::EXPECTED_INPUT_REGISTRATION;
+    protected const DEFAULT_EXPECTED_INPUT = RegistrationCommandHandler::SEND_GREETING;
 
     /** @var int внутренний ID пользователя */
     protected int $id;

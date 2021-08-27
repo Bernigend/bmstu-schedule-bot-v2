@@ -5,10 +5,10 @@ namespace app\command;
 class CommandResult
 {
     /** @var string */
-    protected string $message;
+    protected string $message = '';
 
     /** @var string */
-    protected string $error;
+    protected string $error = '';
 
     /** @var CommandKeyboard|null */
     protected ?CommandKeyboard $keyboard = null;

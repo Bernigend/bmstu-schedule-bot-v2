@@ -4,14 +4,12 @@ require_once '../vendor/autoload.php';
 
 \app\core\Application::createInstance();
 
-$commandHandler = new \app\command\CommandHandler();
-
-$user = \app\user\CommonUser::findByExternalId('1234', 'test');
+$user = \app\user\CommonUser::findByExternalId('12345', 'test');
 if (!$user) {
-    echo 'reg';
-    $user = \app\user\CommonUser::register('1234', 'test');
+    $user = \app\user\CommonUser::register('12345', 'test');
 }
 
-$result = $commandHandler->handle($user, '/today');
+$commandHandler = new \app\command\CommandManager($user, '/nextweek');
+$result = $commandHandler->handle();
 
 var_dump($result);

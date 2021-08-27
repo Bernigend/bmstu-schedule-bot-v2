@@ -7,26 +7,36 @@ use app\command\CommandResult;
 
 class GroupCommandHandler extends ACommandHandler
 {
-    /** @var string */
-    public const EXPECTED_INPUT_GROUP_NAME = 'group.input_group_name';
+    /** @var string ожидание ввода названия группы */
+    public const INPUT_GROUP_NAME = 'group.input_group_name';
 
-    /** @var array|string[] */
-    protected array $expectedInput = [
-        'input_group_name' => 'changeUserGroupCommand',
-    ];
+    /** @var string команда изменения группы */
+    public const CHANGE_GROUP_COMMAND = '/group';
 
-    /** @var array|string[] */
-    protected array $commandHandlers = [
-        '/group' => 'startGroupChangingCommand',
-    ];
+    /** @inheritDoc */
+    public function getExpectedInputHandlers(): array
+    {
+        return [
+            static::INPUT_GROUP_NAME => [$this, 'changeUserGroupCommand'],
+        ];
+    }
+
+    /** @inheritDoc */
+    public function getCommandHandlers(): array
+    {
+        return [
+            static::CHANGE_GROUP_COMMAND => [$this, 'groupCommandHandler'],
+        ];
+    }
 
     /**
      * @return \app\command\CommandResult
      * @throws \app\core\database\exception\SqlException
      */
-    public function proxyRun(): CommandResult
+    public function groupCommandHandler(): CommandResult
     {
-        return $this->defaultRun();
+        $this->commandManager->getCommonUser()->setExpectedInput(static::INPUT_GROUP_NAME)->save();
+        return (new CommandResult())->setMessage($this->renderTemplate('group.send_me_group_name'));
     }
 
     /**
@@ -34,26 +44,14 @@ class GroupCommandHandler extends ACommandHandler
      * @throws \app\core\database\exception\SqlException
      * @throws \Exception
      */
-    protected function changeUserGroupCommand(): CommandResult
+    public function changeUserGroupCommand(): CommandResult
     {
-        $groupUuid = CommonApi::getGroupUuid($this->userInput);
+        $groupUuid = CommonApi::getGroupUuid($this->commandManager->getUserInput());
         if (empty($groupUuid)) {
             return (new CommandResult())->setError($this->renderTemplate('group.cannot_find_group'));
         }
 
-        $this->commonUser->setCurrentGroupId($groupUuid)->setExpectedInput('')->save();
-
+        $this->commandManager->getCommonUser()->setCurrentGroupId($groupUuid)->setExpectedInput('')->save();
         return (new CommandResult())->setMessage($this->renderTemplate('group.group_change_success'));
-    }
-
-    /**
-     * @return \app\command\CommandResult
-     * @throws \app\core\database\exception\SqlException
-     */
-    protected function startGroupChangingCommand(): CommandResult
-    {
-        $this->commonUser->setExpectedInput(static::EXPECTED_INPUT_GROUP_NAME)->save();
-
-        return (new CommandResult())->setMessage($this->renderTemplate('group.send_me_group_name'));
     }
 }

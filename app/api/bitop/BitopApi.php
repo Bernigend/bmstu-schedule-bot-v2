@@ -103,11 +103,15 @@ class BitopApi
              * @var \app\api\common\entity\ScheduleLesson $left
              * @var \app\api\common\entity\ScheduleLesson $right
              */
-            if ($left->getStartAt() === $right->getStartAt()) {
+
+            $leftSortKey = $left->getDay() . $left->getStartAt();
+            $rightSortKey = $right->getDay() . $right->getStartAt();
+
+            if ($leftSortKey === $rightSortKey) {
                 return 0;
             }
 
-            return $left->getStartAt() < $right->getStartAt() ? -1 : 1;
+            return $leftSortKey < $rightSortKey ? -1 : 1;
         });
 
         return $internalSchedule->setScheduleLessonList($scheduleLessonsList);

@@ -11,6 +11,7 @@ use app\core\logger\exception\LoggerException;
 use app\core\logger\ILogger;
 use app\core\module\ModuleManager;
 use app\core\request\Request;
+use app\core\response\Response;
 use RuntimeException;
 
 final class Application
@@ -20,6 +21,9 @@ final class Application
 
     /** @var \app\core\request\Request объект запроса */
     protected Request $request;
+
+    /** @var Response объект ответа */
+    protected Response $response;
 
     /** @var \app\core\database\Database объект базы данных */
     protected Database $database;
@@ -75,6 +79,7 @@ final class Application
     {
         $this->environment = new Environment();
         $this->request = new Request();
+        $this->response = new Response();
         $this->database = new Database();
         $this->moduleManager = new ModuleManager();
 
@@ -151,6 +156,14 @@ final class Application
     public function getRequest(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * @return \app\core\response\Response
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
     }
 
     /**

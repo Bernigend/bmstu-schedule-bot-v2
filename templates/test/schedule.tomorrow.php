@@ -3,13 +3,14 @@
 /**
  * @var bool $isNumerator
  * @var \app\api\common\entity\GroupScheduleData $schedule
+ * @var \app\command\CommandManager $commandManager
  */
 
 $datetime = (new DateTime())->add(new DateInterval('P1D'));
-$today = (int)$datetime->format('N');
+$weekday = (int)$datetime->format('N');
 
-$lessonsList = array_filter($schedule->getScheduleLessonList(), static function ($arLesson) use ($today, $isNumerator) {
-    return $arLesson->getDay() === $today && $arLesson->isNumerator() === $isNumerator;
+$lessonsList = array_filter($schedule->getScheduleLessonList(), static function ($arLesson) use ($weekday, $isNumerator) {
+    return $arLesson->getDay() === $weekday && $arLesson->isNumerator() === $isNumerator;
 });
 
 ?>
@@ -17,16 +18,13 @@ $lessonsList = array_filter($schedule->getScheduleLessonList(), static function 
 📅 Дата: <?= $datetime->format('d.m.y') ?> (<?= $isNumerator ? 'числитель' : 'знаменатель' ?>)
 Группа: <?= $schedule->getGroupName() ?>
 
-—— ——
+-- --
 
-<?php
-foreach ($lessonsList as $lesson) {
-    echo "[{$lesson->getStartAt()} - {$lesson->getEndAt()}]\n";
-    echo "- {$lesson->getName()}\n";
-    echo !empty($lesson->getTeacher()) ? "- {$lesson->getTeacher()}\n" : '';
-}
-?>
+<?= $commandManager->renderTemplate('schedule.template.schedule_day', [
+    'lessonsList' => $lessonsList,
+    'weekday' => $weekday,
+]) ?>
 
-—— ——
+-- --
 
 Пришлите /help для подсказки
