@@ -3,6 +3,7 @@
 namespace app\command\handlers;
 
 use app\api\common\CommonApi;
+use app\command\CommandKeyboard;
 use app\command\CommandResult;
 
 class GroupCommandHandler extends ACommandHandler
@@ -52,6 +53,8 @@ class GroupCommandHandler extends ACommandHandler
         }
 
         $this->commandManager->getCommonUser()->setCurrentGroupId($groupUuid)->setExpectedInput('')->save();
-        return (new CommandResult())->setMessage($this->renderTemplate('group.group_change_success'));
+        return (new CommandResult())
+            ->setMessage($this->renderTemplate('group.group_change_success'))
+            ->setKeyboard(CommandKeyboard::getDefault());
     }
 }

@@ -9,6 +9,8 @@ class Response
         // Prevent echo, print, and flush from killing the script
         ignore_user_abort(true);
 
+        echo $response;
+
         $size = strlen($response);
 
         // Disable compression (in case content length is compressed).
@@ -19,6 +21,8 @@ class Response
 
         // Close the connection.
         header("Connection: close");
+
+        ob_start();
 
         // Flush all output.
         ob_end_flush();

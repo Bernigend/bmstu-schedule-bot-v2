@@ -4,6 +4,7 @@ namespace app\command\handlers;
 
 use app\api\common\CommonApi;
 use app\api\common\entity\GroupScheduleData;
+use app\command\CommandKeyboard;
 use app\command\CommandResult;
 use DateInterval;
 use DateTime;
@@ -100,7 +101,7 @@ class ScheduleCommandHandler extends ACommandHandler
         return (new CommandResult())->setMessage($this->renderTemplate($template, [
             'isNumerator' => call_user_func($numeratorCheck, $schedule),
             'schedule' => $schedule,
-        ]));
+        ]))->setKeyboard(CommandKeyboard::getDefault());
     }
 
     /**

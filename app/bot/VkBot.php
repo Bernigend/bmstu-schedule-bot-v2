@@ -73,6 +73,7 @@ class VkBot extends VKCallbackApiServerHandler
     public function confirmation(int $group_id, ?string $secret): void
     {
         if (!$this->checkSenderServer($group_id, $secret)) {
+            Application::getInstance()->getLogger()->info("[VK] confirmation: {$group_id}, {$secret} access denied");
             die ('Access denied');
         }
 
@@ -92,6 +93,7 @@ class VkBot extends VKCallbackApiServerHandler
     public function messageNew(int $group_id, ?string $secret, array $eventData): bool
     {
         if (!$this->checkSenderServer($group_id, $secret)) {
+            Application::getInstance()->getLogger()->info("[VK] message new: {$group_id}, {$secret} access denied");
             die ('Access denied');
         }
 
@@ -109,17 +111,27 @@ class VkBot extends VKCallbackApiServerHandler
 
         Application::getInstance()->getResponse()->sendAndContinueScript('ok');
 
+        $requestCacheKey = md5($eventData['id'].$eventData['peer_id']);
+        if (!empty(Application::getInstance()->getCache()->get($requestCacheKey, ''))) {
+            return true;
+        }
+        Application::getInstance()->getCache()->set($requestCacheKey, 'Y', 5*86000);
+
         $user = CommonUser::findByExternalId($eventData['peer_id'], 'vk');
         if (!$user) {
             $user = CommonUser::register($eventData['peer_id'], 'vk');
         }
 
-        $commandManager = new CommandManager($user, $eventData['payload'] ?? $eventData['text']);
+        if (!empty($eventData['payload'])) {
+            $eventData['payload'] = json_decode($eventData['payload'], JSON_OBJECT_AS_ARRAY);
+        }
+
+        $commandManager = new CommandManager($user, $eventData['payload']['command'] ?? $eventData['text']);
         $result = $commandManager->handle();
 
         $message = $result->getError() ?: $result->getMessage();
         if (!empty($message)) {
-            $this->sendMessage($user->getExternalId(), $message);
+            $this->sendMessage($user->getExternalId(), $message, $result->getKeyboard());
         }
 
         return true;
@@ -176,6 +188,13 @@ class VkBot extends VKCallbackApiServerHandler
      */
     protected function sendMessage(string $peerID, string $message, string $keyboard = null): void
     {
+        if (is_null($keyboard)) {
+            $keyboard = json_encode(array (
+                'one_time' => true,
+                'buttons'  => array ()
+            ));
+        }
+
         $this->vkApiClient->messages()->send($this->getEnv('ACCESS_TOKEN'), array (
             'peer_id'  => $peerID,
             'message'  => $message,

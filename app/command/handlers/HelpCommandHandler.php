@@ -2,6 +2,7 @@
 
 namespace app\command\handlers;
 
+use app\command\CommandKeyboard;
 use app\command\CommandResult;
 
 class HelpCommandHandler extends ACommandHandler
@@ -28,6 +29,8 @@ class HelpCommandHandler extends ACommandHandler
      */
     public function sendHelpInformation(): CommandResult
     {
-        return (new CommandResult())->setMessage($this->renderTemplate('help.help'));
+        return (new CommandResult())
+            ->setMessage($this->renderTemplate('help.help'))
+            ->setKeyboard(CommandKeyboard::getDefault());
     }
 }

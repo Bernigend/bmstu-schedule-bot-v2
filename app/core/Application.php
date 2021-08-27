@@ -12,7 +12,9 @@ use app\core\logger\ILogger;
 use app\core\module\ModuleManager;
 use app\core\request\Request;
 use app\core\response\Response;
+use Exception;
 use RuntimeException;
+use Throwable;
 
 final class Application
 {
@@ -92,9 +94,12 @@ final class Application
      * @throws \app\core\logger\exception\LoggerException
      * @throws \app\core\cache\exception\CacheException
      * @throws \app\core\module\exception\ModuleLoaderException
+     * @throws \Exception
      */
     protected function init(): self
     {
+        $this->initExceptionHandlers();
+
         $this->environment->init();
         $this->database->connect();
 
@@ -104,6 +109,17 @@ final class Application
         $this->moduleManager->init();
 
         return $this;
+    }
+
+    protected function initExceptionHandlers(): void
+    {
+        set_error_handler(static function ($level, $message, $file, $line) {
+            throw new Exception('Error: '. $message);
+        });
+
+        set_exception_handler(function (Throwable $e) {
+            $this->getLogger()->error("{$e->getMessage()}: {$e->getTraceAsString()}");
+        });
     }
 
     /**
