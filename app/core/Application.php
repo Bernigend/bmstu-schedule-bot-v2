@@ -126,7 +126,6 @@ final class Application
             'dsn' => $sentryDsn,
             'traces_sample_rate' => (float)$this->environment->get('SENTRY_TRACES_SAMPLE_RATE', '0.0'),
             'environment' => $this->environment->getEnvironmentType(),
-            'server_name' => $_SERVER['HTTP_HOST'],
         ]);
     }
 
