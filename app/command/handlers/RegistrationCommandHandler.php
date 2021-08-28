@@ -53,7 +53,15 @@ class RegistrationCommandHandler extends ACommandHandler
      */
     public function waitStartCommand(): CommandResult
     {
-        if ($this->commandManager->getUserInput() !== static::START_COMMAND) {
+        $userInput = mb_strtolower($this->commandManager->getUserInput());
+
+        $inputVariants = [
+            static::START_COMMAND,
+            'start',
+            'начать',
+        ];
+
+        if (!in_array($userInput, $inputVariants)) {
             return new CommandResult();
         }
 
