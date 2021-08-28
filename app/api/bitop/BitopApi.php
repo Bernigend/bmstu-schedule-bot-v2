@@ -58,11 +58,15 @@ class BitopApi
         $payload = (new SearchUnitRequest())->setType('group')->setQuery($groupName);
 
         $apiResponse = $apiInstance->searchUnitPost($payload);
-        if ($apiResponse->getTotal() !== 1) {
-            return '';
+        $foundedItems = $apiResponse->getItems();
+        
+        foreach ($foundedItems as $item) {
+            if (mb_strtolower($item->getCaption()) === mb_strtolower($groupName)) {
+                return $item->getUuid();
+            }
         }
 
-        return $apiResponse->getItems()[0]->getUuid();
+        return '';
     }
 
     /**

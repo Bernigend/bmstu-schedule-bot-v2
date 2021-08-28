@@ -7,4 +7,4 @@
 
 -- --
 
-Powered by @bmstu_schedule
+Powered by @bernigend & @bmstu_schedule
