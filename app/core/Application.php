@@ -9,10 +9,8 @@ use app\core\database\Database;
 use app\core\environment\Environment;
 use app\core\logger\exception\LoggerException;
 use app\core\logger\ILogger;
-use app\core\module\ModuleManager;
 use app\core\request\Request;
 use app\core\response\Response;
-use Exception;
 use RuntimeException;
 use Throwable;
 
@@ -39,9 +37,6 @@ final class Application
     /** @var \app\core\cache\ICache объект кэша */
     protected ICache $cache;
 
-    /** @var \app\core\module\ModuleManager объект менеджера модулей */
-    protected ModuleManager $moduleManager;
-
     /** @var string абсолютный путь к корневой директории приложения */
     protected string $absRootDirectory;
 
@@ -51,7 +46,6 @@ final class Application
      * @return static
      * @throws \app\core\logger\exception\LoggerException
      * @throws \app\core\cache\exception\CacheException
-     * @throws \app\core\module\exception\ModuleLoaderException
      */
     public static function createInstance(): self
     {
@@ -83,7 +77,6 @@ final class Application
         $this->request = new Request();
         $this->response = new Response();
         $this->database = new Database();
-        $this->moduleManager = new ModuleManager();
 
         $this->absRootDirectory = rtrim(dirname(__DIR__, 2), DIRECTORY_SEPARATOR);
     }
@@ -93,33 +86,48 @@ final class Application
      *
      * @throws \app\core\logger\exception\LoggerException
      * @throws \app\core\cache\exception\CacheException
-     * @throws \app\core\module\exception\ModuleLoaderException
-     * @throws \Exception
      */
     protected function init(): self
     {
         $this->initExceptionHandlers();
-
         $this->environment->init();
-        $this->database->connect();
 
         $this->initLogger();
+        $this->initSentry();
+        $this->database->connect();
         $this->initCache();
 
-        $this->moduleManager->init();
+        $this->initShutdownActions();
 
         return $this;
     }
 
     protected function initExceptionHandlers(): void
     {
-        set_error_handler(static function ($level, $message, $file, $line) {
-            throw new Exception('Error: '. $message);
+        set_error_handler(function ($level, $message, $file, $line) {
+            if ($level > E_NOTICE) {
+                $this->getLogger()->error("Error [{$level}, {$file}, {$line}]: {$message}");
+            }
         });
 
         set_exception_handler(function (Throwable $e) {
-            $this->getLogger()->error("{$e->getMessage()}: {$e->getTraceAsString()}");
+            $this->getLogger()->exception($e);
         });
+    }
+
+    protected function initSentry(): void
+    {
+        $sentryDsn = $this->environment->get('SENTRY_DSN', '');
+        if (empty($sentryDsn)) {
+            return;
+        }
+
+        \Sentry\init([
+            'dsn' => $sentryDsn,
+            'traces_sample_rate' => (float)$this->environment->get('SENTRY_TRACES_SAMPLE_RATE', '0.0'),
+            'environment' => $this->environment->getEnvironmentType(),
+            'server_name' => $_SERVER['HTTP_HOST'],
+        ]);
     }
 
     /**
@@ -154,6 +162,16 @@ final class Application
         }
 
         $this->cache = (new $cacheClass)->init();
+    }
+
+    /**
+     * @throws \app\core\cache\exception\CacheException
+     */
+    protected function initShutdownActions(): void
+    {
+        register_shutdown_function(function () {
+            $this->getCache()->eraseExpired();
+        });
     }
 
     /**

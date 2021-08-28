@@ -2,6 +2,8 @@
 
 namespace app\core\logger;
 
+use Throwable;
+
 interface ILogger
 {
     /** @var int тип лога - простое сообщение */
@@ -49,4 +51,11 @@ interface ILogger
      * @return mixed
      */
     public function error(string $value);
+
+    /**
+     * @param \Throwable $e
+     *
+     * @return mixed
+     */
+    public function exception(Throwable $e);
 }

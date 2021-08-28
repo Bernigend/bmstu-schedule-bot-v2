@@ -2,6 +2,8 @@
 
 namespace app\core\logger;
 
+use Throwable;
+
 class DisabledLogger implements ILogger
 {
     /**
@@ -16,31 +18,26 @@ class DisabledLogger implements ILogger
      * @inheritDoc
      */
     public function write(string $value, int $type = self::MESSAGE)
-    {
-        // TODO: Implement write() method.
-    }
+    {}
 
     /**
      * @inheritDoc
      */
     public function info(string $value)
-    {
-        // TODO: Implement info() method.
-    }
+    {}
 
     /**
      * @inheritDoc
      */
     public function warn(string $value)
-    {
-        // TODO: Implement warn() method.
-    }
+    {}
 
     /**
      * @inheritDoc
      */
     public function error(string $value)
-    {
-        // TODO: Implement error() method.
-    }
+    {}
+
+    public function exception(Throwable $e)
+    {}
 }

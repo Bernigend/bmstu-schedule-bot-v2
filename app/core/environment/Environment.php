@@ -35,6 +35,9 @@ class Environment
     /** @var string */
     protected const BITOP_ACCESS_TOKEN = 'BITOP_ACCESS_TOKEN';
 
+    /** @var string */
+    protected const ENVIRONMENT_TYPE = 'ENVIRONMENT';
+
     /** @var string[] обязательные переменные */
     protected const REQUIRED_VARS = [
         self::DATABASE_HOST,
@@ -147,5 +150,13 @@ class Environment
     public function getBitopAccessToken(): ?string
     {
         return $this->get(static::BITOP_ACCESS_TOKEN);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnvironmentType(): string
+    {
+        return $this->get(static::ENVIRONMENT_TYPE, 'production');
     }
 }

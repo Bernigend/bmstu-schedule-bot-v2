@@ -23,7 +23,6 @@ final class CreateCacheTable extends AbstractMigration
 
             ->addColumn('cache_key', 'string', ['null' => false])
             ->addColumn('cache_value', 'string')
-            ->addColumn('module_id', 'string', ['null' => false, 'default' => 'no'])
             ->addColumn('created_at', 'timestamp', ['null' => false, 'default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('ttl', 'integer', ['null' => false, 'default' => 3600])
 

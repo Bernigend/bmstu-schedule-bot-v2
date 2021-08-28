@@ -17,27 +17,30 @@ interface ICache
      * @param string $key уникальный ключ для сохранения
      * @param string $value значение для сохранения
      * @param int $ttl время жизни кэша
-     * @param string $moduleId ID модуля
      */
-    public function set(string $key, string $value, int $ttl = 3600, string $moduleId = 'no'): void;
+    public function set(string $key, string $value, int $ttl = 3600): void;
 
     /**
      * Вовзвращает значение из кэша по указанному ключу.
      *
      * @param string $key уникальный ключ для сохранения
      * @param string|null $defaultValue значение по умолчанию, если значение не было найдено
-     * @param string $moduleId ID модуля
      *
      * @return string
      */
-    public function get(string $key, ?string $defaultValue = null, string $moduleId = 'no'): string;
+    public function get(string $key, ?string $defaultValue = null): string;
 
     /**
      * Удаляет весь кэш.
      *
-     * @param string $moduleId ID модуля
+     * @throws \app\core\cache\exception\CacheException
+     */
+    public function eraseAll(): void;
+
+    /**
+     * Удаляет весь истёкший кэш.
      *
      * @throws \app\core\cache\exception\CacheException
      */
-    public function eraseAll(string $moduleId = 'no'): void;
+    public function eraseExpired(): void;
 }

@@ -4,6 +4,7 @@ namespace app\core\logger;
 
 use app\core\Application;
 use app\core\logger\exception\LoggerException;
+use Throwable;
 
 class FileLogger implements ILogger
 {
@@ -50,6 +51,12 @@ class FileLogger implements ILogger
     public function error(string $value)
     {
         $this->write($value, static::ERROR);
+    }
+
+    /** @inheritDoc */
+    public function exception(Throwable $e)
+    {
+        $this->write("Exception: {$e->getMessage()}: {$e->getTraceAsString()}", static::ERROR);
     }
 
     /**

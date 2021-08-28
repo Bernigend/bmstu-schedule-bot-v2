@@ -203,4 +203,12 @@ class VkBot extends VKCallbackApiServerHandler
             'random_id' => random_int(1, 999999999999)
         ));
     }
+
+    /**
+     * @return \VK\Client\VKApiClient
+     */
+    public function getVkApiClient(): VKApiClient
+    {
+        return $this->vkApiClient;
+    }
 }

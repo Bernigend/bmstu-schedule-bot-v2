@@ -26,7 +26,10 @@ final class CreateCommonUsersTable extends AbstractMigration
             ->addColumn('expected_input', 'string', ['null' => false, 'default' => ''])
             ->addColumn('current_group_id', 'string', ['null' => false, 'default' => ''])
 
-            ->addIndex(['namespace', 'external_id'])
+            ->addIndex(['namespace', 'external_id'], [
+                'name' => 'namespace_external_id_index',
+                'unique' => true,
+            ])
 
             ->create();
     }

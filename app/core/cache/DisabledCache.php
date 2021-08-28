@@ -11,16 +11,20 @@ class DisabledCache implements ICache
     }
 
     /** @inheritDoc */
-    public function set(string $key, string $value, int $ttl = 3600, string $moduleId = 'no'): void
+    public function set(string $key, string $value, int $ttl = 3600): void
     {}
 
     /** @inheritDoc */
-    public function get(string $key, ?string $defaultValue = null, string $moduleId = 'no'): string
+    public function get(string $key, ?string $defaultValue = null): string
     {
         return $defaultValue;
     }
 
     /** @inheritDoc */
-    public function eraseAll(string $moduleId = 'no'): void
+    public function eraseAll(): void
+    {}
+
+    /** @inheritDoc */
+    public function eraseExpired(): void
     {}
 }

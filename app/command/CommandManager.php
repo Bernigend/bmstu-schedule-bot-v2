@@ -9,6 +9,7 @@ use app\command\handlers\RegistrationCommandHandler;
 use app\command\handlers\ScheduleCommandHandler;
 use app\core\Application;
 use app\user\CommonUser;
+use Throwable;
 
 class CommandManager
 {
@@ -65,11 +66,17 @@ class CommandManager
      */
     public function handle(): CommandResult
     {
-        if (!empty($this->commonUser->getExpectedInput())) {
-            return $this->handleByExpectedInput();
-        }
+        try {
+            if (!empty($this->commonUser->getExpectedInput())) {
+                return $this->handleByExpectedInput();
+            }
 
-        return $this->handleByUserInput();
+            return $this->handleByUserInput();
+        } catch (Throwable $e) {
+            Application::getInstance()->getLogger()->exception($e);
+            \Sentry\captureException($e);
+            return (new CommandResult())->setError("Произошла какая-то ошибка, попробуйте ещё. \n Пришлите /help для справки");
+        }
     }
 
     /**
@@ -103,26 +110,6 @@ class CommandManager
         }
 
         return call_user_func($this->commandHandlers[$userCommand]);
-    }
-
-    /**
-     * @param string $expectedInput
-     *
-     * @return string
-     */
-    public static function getExpectedInputType(string $expectedInput): string
-    {
-        return explode('.', $expectedInput)[0] ?? '';
-    }
-
-    /**
-     * @param string $expectedInput
-     *
-     * @return string
-     */
-    public static function getExpectedInputKey(string $expectedInput): string
-    {
-        return explode('.', $expectedInput)[1] ?? '';
     }
 
     /**
