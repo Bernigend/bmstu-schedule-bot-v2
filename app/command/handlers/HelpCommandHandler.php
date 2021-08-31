@@ -21,6 +21,8 @@ class HelpCommandHandler extends ACommandHandler
     {
         return [
             static::HELP_COMMAND => [$this, 'sendHelpInformation'],
+            'help' => [$this, 'sendHelpInformation'],
+            'помощь' => [$this, 'sendHelpInformation'],
         ];
     }
 

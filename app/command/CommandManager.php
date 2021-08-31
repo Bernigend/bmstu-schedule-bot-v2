@@ -119,6 +119,7 @@ class CommandManager
      */
     public static function getCommandFromUserInput(string $userInput): string
     {
+        $userInput = mb_strtolower($userInput);
         return explode(' ', $userInput)[0];
     }
 
