@@ -8,6 +8,7 @@ use app\command\CommandKeyboard;
 use app\command\CommandResult;
 use DateInterval;
 use DateTime;
+use DateTimeZone;
 
 class ScheduleCommandHandler extends ACommandHandler
 {
@@ -112,7 +113,7 @@ class ScheduleCommandHandler extends ACommandHandler
      */
     protected function getTodayIsNumerator(GroupScheduleData $scheduleData): bool
     {
-        return $this->getWeekIsNumerator($scheduleData, (new DateTime())->format('W'));
+        return $this->getWeekIsNumerator($scheduleData, new DateTime());
     }
 
     /**
@@ -123,7 +124,7 @@ class ScheduleCommandHandler extends ACommandHandler
      */
     protected function getTomorrowIsNumerator(GroupScheduleData $scheduleData): bool
     {
-        return $this->getWeekIsNumerator($scheduleData, (new DateTime())->add(new DateInterval('P1D'))->format('W'));
+        return $this->getWeekIsNumerator($scheduleData, (new DateTime())->add(new DateInterval('P1D')));
     }
 
     /**
@@ -145,36 +146,29 @@ class ScheduleCommandHandler extends ACommandHandler
      */
     protected function getNextWeekIsNumerator(GroupScheduleData $scheduleData): bool
     {
-        return $this->getWeekIsNumerator($scheduleData, (new DateTime())->add(new DateInterval('P1W'))->format('W'));
+        return $this->getWeekIsNumerator($scheduleData, (new DateTime())->add(new DateInterval('P1W')));
     }
 
     /**
      * Определяет нумератор или нет неделя.
      *
      * @param \app\api\common\entity\GroupScheduleData $scheduleData
-     * @param int|null $currentWeekNumber
+     * @param \DateTime|null $localDateTime
      *
      * @return bool
      * @throws \Exception
      */
-    protected function getWeekIsNumerator(GroupScheduleData $scheduleData, int $currentWeekNumber = null): bool
+    protected function getWeekIsNumerator(GroupScheduleData $scheduleData, ?DateTime $localDateTime = null): bool
     {
-        $semesterStartWeek = (new DateTime($scheduleData->getSemesterStartAt()))->format('W');
+        $apiDateTime = $scheduleData->getSemesterStartAtDateTime();
+        $localDateTime = ($localDateTime ?? (new DateTime()))->setTimezone($apiDateTime->getTimezone());
 
-        if (is_null($currentWeekNumber)) {
-            $currentWeekNumber = (new DateTime())->format('W');
+        $weekDifference = abs($apiDateTime->format('W') - $localDateTime->format('W')) % 2;
+
+        if ($weekDifference === 0) {
+            return $scheduleData->isNumeratorFirst();
         }
 
-        $weekDifference = abs(($currentWeekNumber - $semesterStartWeek) % 2);
-
-        if ($weekDifference === 0 && $scheduleData->isNumeratorFirst()) {
-            return true;
-        }
-
-        if ($weekDifference === 1 && !$scheduleData->isNumeratorFirst()) {
-            return true;
-        }
-
-        return false;
+        return !$scheduleData->isNumeratorFirst();
     }
 }

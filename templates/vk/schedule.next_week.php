@@ -14,6 +14,11 @@ $weekdayEnd = new DateTime("last sunday of next week");
 📅 Дата: <?= $weekdayStart->format('d.m.Y') ?> - <?= $weekdayEnd->format('d.m.Y') ?> (<?= $isNumerator ? 'числитель' : 'знаменатель' ?>)
 Группа: <?= $schedule->getGroupName() ?>
 
+<? if ($schedule->getSemesterStartAtDateTime()->diff(new DateTime())->days < 14) {
+    echo "\n-- --\n\n";
+    echo $commandManager->renderTemplate('schedule.warn.schedule_can_be_updated');
+    echo "\n";
+} ?>
 
 <? for ($i = 1; $i < 7; $i++) {
     echo "-- -- \n\n";

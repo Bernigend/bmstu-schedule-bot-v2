@@ -2,6 +2,8 @@
 
 namespace app\api\common\entity;
 
+use DateTime;
+
 class GroupScheduleData
 {
     /** @var \app\api\common\entity\ScheduleLesson[] */
@@ -18,6 +20,15 @@ class GroupScheduleData
 
     /** @var string */
     public string $groupName = '';
+
+    /**
+     * @return \DateTime
+     * @throws \Exception
+     */
+    public function getSemesterStartAtDateTime(): DateTime
+    {
+        return (new DateTime($this->semesterStartAt))->setTimezone(new \DateTimeZone('+0300'));
+    }
 
     /**
      * @return \app\api\common\entity\ScheduleLesson[]
@@ -113,6 +124,4 @@ class GroupScheduleData
         $this->groupName = $groupName;
         return $this;
     }
-
-
 }

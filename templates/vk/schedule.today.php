@@ -17,6 +17,11 @@ $lessonsList = array_filter($schedule->getScheduleLessonList(), static function 
 📅 Дата: <?= date('d.m.y') ?> (<?= $isNumerator ? 'числитель' : 'знаменатель' ?>)
 Группа: <?= $schedule->getGroupName() ?>
 
+<? if ($schedule->getSemesterStartAtDateTime()->diff(new DateTime())->days < 14) {
+    echo "\n-- --\n\n";
+    echo $commandManager->renderTemplate('schedule.warn.schedule_can_be_updated');
+    echo "\n";
+} ?>
 
 -- --
 
